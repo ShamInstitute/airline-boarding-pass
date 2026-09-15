@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airline Boarding Pass System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2c3e50 0%, #3498db 100%);
+            color: white;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 5px;
+        }
+
+        .header p {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .content {
+            padding: 40px 30px;
+            min-height: 500px;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* PAGE 1: PASSENGER DETAILS */
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid #ecf0f1;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.1);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* PAGE 2: SEAT ALLOCATION */
+        .cabin-layout {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+
+        .cabin-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .cabin-info-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+        }
+
+        .seat-indicator {
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 10px;
+            color: white;
+            font-weight: bold;
+        }
+
+        .seat-indicator.available {
+            background: #27ae60;
+        }
+
+        .seat-indicator.occupied {
+            background: #e74c3c;
+        }
+
+        .seat-indicator.selected {
+            background: #3498db;
+        }
+
+        .deck {
+            margin-bottom: 30px;
+        }
+
+        .deck-label {
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 14px;
+        }
+
+        .rows {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .row-number {
+            width: 30px;
+            text-align: center;
+            font-weight: 600;
+            color: #7f8c8d;
+            font-size: 12px;
+        }
+
+        .seats-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .seats-block {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .seat {
+            width: 40px;
+            height: 40px;
+            border: 2px solid #bdc3c7;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .seat.available:hover {
+            transform: scale(1.1);
+            border-color: #3498db;
+        }
+
+        .seat.available {
+            background: #27ae60;
+            color: white;
+            border-color: #27ae60;
+        }
+
+        .seat.occupied {
+            background: #e74c3c;
+            color: white;
+            border-color: #e74c3c;
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+
+        .seat.selected {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.3);
+        }
+
+        .selected-seat-display {
+            background: #ecf0f1;
+            padding: 15px;
+            border-radius: 6px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .selected-seat-display strong {
+            color: #3498db;
+            font-size: 20px;
+        }
+
+        /* PAGE 3: BOARDING PASS */
+        .boarding-pass {
+            background: linear-gradient(to right, #fff 0%, #f8f9fa 50%, #fff 100%);
+            border: 3px dashed #bdc3c7;
+            border-radius: 8px;
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .boarding-pass-header {
+            text-align: center;
+            border-bottom: 2px solid #2c3e50;
+            padding-bottom: 20px;
+            margin-bottom: 25px;
+        }
+
+        .airline-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .training-label {
+            background: #e74c3c;
+            color: white;
+            padding: 8px 15px;
+            display: inline-block;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 12px;
+            margin-top: 10px;
+            letter-spacing: 2px;
+        }
+
+        .pass-section {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .pass-section.full {
+            grid-template-columns: 1fr;
+        }
+
+        .pass-field {
+            margin-bottom: 20px;
+        }
+
+        .pass-field-label {
+            font-size: 11px;
+            font-weight: 700;
+            color: #7f8c8d;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 5px;
+        }
+
+        .pass-field-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        .pass-section.baggage .pass-field-value {
+            font-size: 14px;
+        }
+
+        .barcode-section {
+            text-align: center;
+            padding: 20px 0;
+            border-top: 2px solid #2c3e50;
+            border-bottom: 2px solid #2c3e50;
+            margin: 30px 0;
+        }
+
+        .barcode-text {
+            font-family: 'Courier New', monospace;
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 4px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .barcode-display {
+            font-size: 40px;
+            letter-spacing: 2px;
+            color: #2c3e50;
+            font-family: 'Courier New', monospace;
+        }
+
+        .footer-nav {
+            display: flex;
+            gap: 15px;
+            margin-top: 40px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 30px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-primary {
+            background: #3498db;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2980b9;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
+        }
+
+        .btn-primary:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: #95a5a6;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        .btn-success {
+            background: #27ae60;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #229954;
+            transform: translateY(-2px);
+        }
+
+        .btn-print {
+            background: #9b59b6;
+            color: white;
+        }
+
+        .btn-print:hover {
+            background: #8e44ad;
+            transform: translateY(-2px);
+        }
+
+        .error-message {
+            color: #e74c3c;
+            font-size: 13px;
+            margin-top: 5px;
+        }
+
+        .success-message {
+            background: #d5f4e6;
+            color: #27ae60;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .page-indicator {
+            text-align: center;
+            color: #7f8c8d;
+            font-size: 12px;
+            margin-top: 30px;
+        }
+
+        @media print {
+            body {
+                background: white;
+            }
+            .container {
+                box-shadow: none;
+            }
+            .header {
+                background: #2c3e50;
+            }
+            .footer-nav {
+                display: none;
+            }
+            .boarding-pass {
+                border: 1px solid #2c3e50;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .content {
+                padding: 25px 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .pass-section {
+                gap: 15px;
+            }
+
+            .seat {
+                width: 35px;
+                height: 35px;
+                font-size: 10px;
+            }
+
+            .row-number {
+                width: 25px;
+                font-size: 11px;
+            }
+
+            .boarding-pass {
+                padding: 25px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>✈️ Airline Boarding Pass System</h1>
+            <p>Training System - Not Valid for Travel</p>
+        </div>
+
+        <div class="content">
+            <!-- PAGE 1: PASSENGER DETAILS -->
+            <div class="page active" id="page1">
+                <h2 style="margin-bottom: 30px; color: #2c3e50;">Passenger Information</h2>
+                
+                <div class="form-group">
+                    <label for="passengerName">Full Name *</label>
+                    <input type="text" id="passengerName" placeholder="e.g., John Smith">
+                    <div class="error-message" id="nameError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="pnr">PNR (Booking Reference) *</label>
+                    <input type="text" id="pnr" placeholder="e.g., ABC123" maxlength="6">
+                    <div class="error-message" id="pnrError"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="baggageTag">Baggage Tag *</label>
+                    <input type="text" id="baggageTag" placeholder="e.g., SFO1234567">
+                    <div class="error-message" id="baggageTagError"></div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="baggageWeight">Baggage Weight (kg) *</label>
+                        <input type="number" id="baggageWeight" placeholder="e.g., 23" min="0" max="100">
+                        <div class="error-message" id="weightError"></div>
+                    </div>
+                    <div class="form-group">
+                        <label for="seatNumber">Seat Number *</label>
+                        <input type="text" id="seatNumber" placeholder="Auto-selected later" readonly style="background: #ecf0f1;">
+                    </div>
+                </div>
+
+                <div class="footer-nav">
+                    <button class="btn-primary" onclick="goToPage(2)">Continue to Seat Selection</button>
+                </div>
+
+                <div class="page-indicator">Page 1 of 3</div>
+            </div>
+
+            <!-- PAGE 2: SEAT ALLOCATION -->
+            <div class="page" id="page2">
+                <h2 style="margin-bottom: 20px; color: #2c3e50;">Wide-Body Aircraft Seat Selection</h2>
+                <p style="color: #7f8c8d; margin-bottom: 25px;">Select your preferred seat from the cabin layout below</p>
+
+                <div class="cabin-layout">
+                    <div class="cabin-info">
+                        <div class="cabin-info-item">
+                            <div class="seat-indicator available">✓</div>
+                            <span>Available</span>
+                        </div>
+                        <div class="cabin-info-item">
+                            <div class="seat-indicator occupied">✕</div>
+                            <span>Occupied</span>
+                        </div>
+                        <div class="cabin-info-item">
+                            <div class="seat-indicator selected">✓</div>
+                            <span>Selected</span>
+                        </div>
+                    </div>
+
+                    <div id="selectedSeatDisplay" class="selected-seat-display" style="display: none;">
+                        Selected Seat: <strong id="selectedSeatText"></strong>
+                    </div>
+
+                    <!-- UPPER DECK -->
+                    <div class="deck">
+                        <div class="deck-label">UPPER DECK</div>
+                        <div class="rows" id="upperDeck"></div>
+                    </div>
+
+                    <!-- MAIN DECK -->
+                    <div class="deck">
+                        <div class="deck-label">MAIN DECK</div>
+                        <div class="rows" id="mainDeck"></div>
+                    </div>
+                </div>
+
+                <div class="footer-nav">
+                    <button class="btn-secondary" onclick="goToPage(1)">Back</button>
+                    <button class="btn-primary" id="continueToPass" onclick="goToPage(3)" disabled>Continue to Boarding Pass</button>
+                </div>
+
+                <div class="page-indicator">Page 2 of 3</div>
+            </div>
+
+            <!-- PAGE 3: BOARDING PASS -->
+            <div class="page" id="page3">
+                <h2 style="margin-bottom: 30px; text-align: center; color: #2c3e50;">Your Boarding Pass</h2>
+
+                <div class="boarding-pass">
+                    <div class="boarding-pass-header">
+                        <div class="airline-name">GLOBAL AIRWAYS</div>
+                        <div style="color: #7f8c8d; font-size: 12px;">Training System</div>
+                        <div class="training-label">TRAINING / NOT VALID FOR TRAVEL</div>
+                    </div>
+
+                    <div class="pass-section">
+                        <div class="pass-field">
+                            <div class="pass-field-label">Passenger Name</div>
+                            <div class="pass-field-value" id="bpPassengerName"></div>
+                        </div>
+                        <div class="pass-field">
+                            <div class="pass-field-label">PNR</div>
+                            <div class="pass-field-value" id="bpPNR"></div>
+                        </div>
+                    </div>
+
+                    <div class="pass-section">
+                        <div class="pass-field">
+                            <div class="pass-field-label">Flight</div>
+                            <div class="pass-field-value" id="bpFlight">GA001</div>
+                        </div>
+                        <div class="pass-field">
+                            <div class="pass-field-label">Seat</div>
+                            <div class="pass-field-value" id="bpSeat"></div>
+                        </div>
+                    </div>
+
+                    <div class="pass-section">
+                        <div class="pass-field">
+                            <div class="pass-field-label">Boarding Group</div>
+                            <div class="pass-field-value" id="bpBoardingGroup">3</div>
+                        </div>
+                        <div class="pass-field">
+                            <div class="pass-field-label">Gate</div>
+                            <div class="pass-field-value" id="bpGate">42</div>
+                        </div>
+                    </div>
+
+                    <div class="barcode-section">
+                        <div class="barcode-text" id="bpBarcodeText"></div>
+                        <div class="barcode-display">||||| |||| |||||</div>
+                    </div>
+
+                    <div class="pass-section baggage">
+                        <div class="pass-field">
+                            <div class="pass-field-label">Baggage Tag</div>
+                            <div class="pass-field-value" id="bpBaggageTag"></div>
+                        </div>
+                        <div class="pass-field">
+                            <div class="pass-field-label">Weight Limit</div>
+                            <div class="pass-field-value" id="bpWeight"></div>
+                        </div>
+                    </div>
+
+                    <div class="pass-section full" style="margin-bottom: 0;">
+                        <div class="pass-field">
+                            <div class="pass-field-label">Issued</div>
+                            <div class="pass-field-value" id="bpIssued"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-nav">
+                    <button class="btn-secondary" onclick="goToPage(2)">Back to Seats</button>
+                    <button class="btn-print" onclick="printBoardingPass()">🖨️ Print Boarding Pass</button>
+                    <button class="btn-success" onclick="startOver()">Start New Booking</button>
+                </div>
+
+                <div class="page-indicator">Page 3 of 3</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DATA
+        const state = {
+            currentPage: 1,
+            passenger: {
+                name: '',
+                pnr: '',
+                baggageTag: '',
+                weight: '',
+                seat: ''
+            },
+            selectedSeat: null,
+            occupiedSeats: new Set()
+        };
+
+        // Initialize occupied seats (realistic distribution)
+        const occupiedSeatsList = [
+            '1A', '1B', '2D', '2E', '2F', '3C', '4A', '4B', '5E', '6D', '7A', '7F',
+            '8B', '8C', '9D', '9E', '10A', '10F', '11C', '11D', '12B', '12E',
+            '13A', '13F', '14D', '14E', '15B', '15C', '16A', '16F', '17E',
+            '1H', '2H', '3G', '4G', '5H', '6H', '7G', '8H', '9G', '10H'
+        ];
+        occupiedSeatsList.forEach(seat => state.occupiedSeats.add(seat));
+
+        // NAVIGATION
+        function goToPage(pageNum) {
+            if (pageNum === 2) {
+                if (!validatePage1()) return;
+            }
+            if (pageNum === 3) {
+                if (!state.selectedSeat) {
+                    alert('Please select a seat first');
+                    return;
+                }
+                populateBoardingPass();
+            }
+
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            document.getElementById('page' + pageNum).classList.add('active');
+            state.currentPage = pageNum;
+            window.scrollTo(0, 0);
+        }
+
+        // VALIDATION
+        function validatePage1() {
+            let valid = true;
+            const name = document.getElementById('passengerName').value.trim();
+            const pnr = document.getElementById('pnr').value.trim();
+            const baggageTag = document.getElementById('baggageTag').value.trim();
+            const weight = document.getElementById('baggageWeight').value.trim();
+
+            document.getElementById('nameError').textContent = '';
+            document.getElementById('pnrError').textContent = '';
+            document.getElementById('baggageTagError').textContent = '';
+            document.getElementById('weightError').textContent = '';
+
+            if (!name) {
+                document.getElementById('nameError').textContent = 'Passenger name is required';
+                valid = false;
+            } else if (name.length < 3) {
+                document.getElementById('nameError').textContent = 'Name must be at least 3 characters';
+                valid = false;
+            }
+
+            if (!pnr) {
+                document.getElementById('pnrError').textContent = 'PNR is required';
+                valid = false;
+            } else if (pnr.length < 3) {
+                document.getElementById('pnrError').textContent = 'PNR must be at least 3 characters';
+                valid = false;
+            }
+
+            if (!baggageTag) {
+                document.getElementById('baggageTagError').textContent = 'Baggage tag is required';
+                valid = false;
+            }
+
+            if (!weight || parseInt(weight) <= 0) {
+                document.getElementById('weightError').textContent = 'Valid baggage weight is required';
+                valid = false;
+            } else if (parseInt(weight) > 100) {
+                document.getElementById('weightError').textContent = 'Weight cannot exceed 100 kg';
+                valid = false;
+            }
+
+            if (valid) {
+                state.passenger.name = name;
+                state.passenger.pnr = pnr;
+                state.passenger.baggageTag = baggageTag;
+                state.passenger.weight = weight;
+            }
+
+            return valid;
+        }
+
+        // SEAT MAP GENERATION
+        function generateCabin() {
+            const upperDeck = document.getElementById('upperDeck');
+            const mainDeck = document.getElementById('mainDeck');
+
+            upperDeck.innerHTML = '';
+            mainDeck.innerHTML = '';
+
+            // Upper Deck: 8 rows (1-8)
+            for (let row = 1; row <= 8; row++) {
+                upperDeck.appendChild(createRow(row, 'ABCDEFGH'));
+            }
+
+            // Main Deck: 32 rows (9-40)
+            for (let row = 9; row <= 40; row++) {
+                mainDeck.appendChild(createRow(row, 'ABCDEFGH'));
+            }
+        }
+
+        function createRow(rowNum, seats) {
+            const rowDiv = document.createElement('div');
+            rowDiv.className = 'row';
+
+            const rowLabel = document.createElement('div');
+            rowLabel.className = 'row-number';
+            rowLabel.textContent = rowNum;
+            rowDiv.appendChild(rowLabel);
+
+            const seatsGroup = document.createElement('div');
+            seatsGroup.className = 'seats-group';
+
+            // Split seats: ABC (left), spacer, DEF (middle), spacer, GH (right) - typical wide-body
+            const blocks = [
+                seats.substring(0, 3),  // ABC
+                seats.substring(3, 6),  // DEF
+                seats.substring(6, 8)   // GH
+            ];
+
+            blocks.forEach((block, blockIndex) => {
+                if (blockIndex > 0) {
+                    const spacer = document.createElement('div');
+                    spacer.style.width = '15px';
+                    seatsGroup.appendChild(spacer);
+                }
+
+                const seatsBlock = document.createElement('div');
+                seatsBlock.className = 'seats-block';
+
+                for (let seat of block) {
+                    const seatNum = rowNum + seat;
+                    const seatBtn = document.createElement('button');
+                    seatBtn.className = 'seat';
+                    seatBtn.textContent = seat;
+                    seatBtn.dataset.seatNum = seatNum;
+
+                    if (state.occupiedSeats.has(seatNum)) {
+                        seatBtn.classList.add('occupied');
+                        seatBtn.disabled = true;
+                    } else {
+                        seatBtn.classList.add('available');
+                        seatBtn.onclick = (e) => {
+                            e.preventDefault();
+                            selectSeat(seatNum, seatBtn);
+                        };
+                    }
+
+                    seatsBlock.appendChild(seatBtn);
+                }
+
+                seatsGroup.appendChild(seatsBlock);
+            });
+
+            rowDiv.appendChild(seatsGroup);
+            return rowDiv;
+        }
+
+        function selectSeat(seatNum, seatBtn) {
+            // Deselect previous
+            if (state.selectedSeat) {
+                const prevBtn = document.querySelector(`[data-seat-num="${state.selectedSeat}"]`);
+                if (prevBtn) prevBtn.classList.remove('selected');
+            }
+
+            // Select new
+            state.selectedSeat = seatNum;
+            state.passenger.seat = seatNum;
+            document.getElementById('seatNumber').value = seatNum;
+            seatBtn.classList.add('selected');
+
+            // Show display
+            const display = document.getElementById('selectedSeatDisplay');
+            document.getElementById('selectedSeatText').textContent = seatNum;
+            display.style.display = 'block';
+
+            // Enable continue button
+            document.getElementById('continueToPass').disabled = false;
+        }
+
+        // BOARDING PASS
+        function populateBoardingPass() {
+            document.getElementById('bpPassengerName').textContent = state.passenger.name.toUpperCase();
+            document.getElementById('bpPNR').textContent = state.passenger.pnr.toUpperCase();
+            document.getElementById('bpSeat').textContent = state.passenger.seat;
+            document.getElementById('bpBaggageTag').textContent = state.passenger.baggageTag;
+            document.getElementById('bpWeight').textContent = state.passenger.weight + ' kg';
+            document.getElementById('bpBarcodeText').textContent = state.passenger.pnr.toUpperCase();
+
+            const now = new Date();
+            const dateStr = now.toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'short', 
+                day: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            document.getElementById('bpIssued').textContent = dateStr;
+        }
+
+        function printBoardingPass() {
+            window.print();
+        }
+
+        function startOver() {
+            state.selectedSeat = null;
+            state.passenger = {
+                name: '',
+                pnr: '',
+                baggageTag: '',
+                weight: '',
+                seat: ''
+            };
+
+            document.getElementById('passengerName').value = '';
+            document.getElementById('pnr').value = '';
+            document.getElementById('baggageTag').value = '';
+            document.getElementById('baggageWeight').value = '';
+            document.getElementById('seatNumber').value = '';
+            document.getElementById('selectedSeatDisplay').style.display = 'none';
+            document.getElementById('continueToPass').disabled = true;
+
+            document.querySelectorAll('.seat.selected').forEach(s => s.classList.remove('selected'));
+
+            goToPage(1);
+        }
+
+        // INIT
+        document.addEventListener('DOMContentLoaded', () => {
+            generateCabin();
+        });
+    </script>
+</body>
+</html>
