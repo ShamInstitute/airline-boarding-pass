@@ -251,97 +251,132 @@
         }
 
         /* PAGE 3: BOARDING PASS */
-        .boarding-pass {
-            background: linear-gradient(to right, #fff 0%, #f8f9fa 50%, #fff 100%);
-            border: 3px dashed #bdc3c7;
-            border-radius: 8px;
-            padding: 40px;
-            max-width: 600px;
-            margin: 0 auto;
+        .boarding-pass-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
-        .boarding-pass-header {
-            text-align: center;
-            border-bottom: 2px solid #2c3e50;
-            padding-bottom: 20px;
-            margin-bottom: 25px;
+        .boarding-pass {
+            width: 100%;
+            max-width: 600px;
+            aspect-ratio: 16 / 9;
+            background: linear-gradient(to right, #ffffff 0%, #f5f5f5 50%, #ffffff 100%);
+            border: 3px solid #2c3e50;
+            border-radius: 8px;
+            padding: 25px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .boarding-pass::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: repeating-linear-gradient(
+                to bottom,
+                #2c3e50 0px,
+                #2c3e50 10px,
+                transparent 10px,
+                transparent 20px
+            );
+            transform: translateX(-1px);
+        }
+
+        .pass-left {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-right: 15px;
+        }
+
+        .pass-right {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            padding-left: 15px;
+        }
+
+        .airline-header {
+            text-align: left;
         }
 
         .airline-name {
-            font-size: 24px;
+            font-size: 20px;
             font-weight: 700;
             color: #2c3e50;
+            margin-bottom: 3px;
+        }
+
+        .airline-logo {
+            font-size: 24px;
             margin-bottom: 5px;
         }
 
         .training-label {
             background: #e74c3c;
             color: white;
-            padding: 8px 15px;
-            display: inline-block;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 3px;
             font-weight: 700;
-            font-size: 12px;
-            margin-top: 10px;
-            letter-spacing: 2px;
+            font-size: 10px;
+            display: inline-block;
+            letter-spacing: 1px;
         }
 
-        .pass-section {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 30px;
-            margin-bottom: 30px;
-        }
-
-        .pass-section.full {
-            grid-template-columns: 1fr;
+        .pass-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
         }
 
         .pass-field {
-            margin-bottom: 20px;
+            display: flex;
+            flex-direction: column;
         }
 
         .pass-field-label {
-            font-size: 11px;
+            font-size: 9px;
             font-weight: 700;
             color: #7f8c8d;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 5px;
+            letter-spacing: 0.5px;
         }
 
         .pass-field-value {
-            font-size: 18px;
+            font-size: 16px;
             font-weight: 700;
             color: #2c3e50;
+            margin-top: 2px;
         }
 
-        .pass-section.baggage .pass-field-value {
-            font-size: 14px;
+        .barcode-area {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            gap: 5px;
         }
 
-        .barcode-section {
-            text-align: center;
-            padding: 20px 0;
-            border-top: 2px solid #2c3e50;
-            border-bottom: 2px solid #2c3e50;
-            margin: 30px 0;
+        .barcode-display {
+            font-size: 24px;
+            letter-spacing: 2px;
+            color: #2c3e50;
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
         }
 
         .barcode-text {
             font-family: 'Courier New', monospace;
-            font-size: 16px;
+            font-size: 12px;
             font-weight: bold;
-            letter-spacing: 4px;
             color: #2c3e50;
-            margin-bottom: 10px;
-        }
-
-        .barcode-display {
-            font-size: 40px;
-            letter-spacing: 2px;
-            color: #2c3e50;
-            font-family: 'Courier New', monospace;
         }
 
         .footer-nav {
@@ -415,15 +450,6 @@
             margin-top: 5px;
         }
 
-        .success-message {
-            background: #d5f4e6;
-            color: #27ae60;
-            padding: 15px;
-            border-radius: 6px;
-            margin-bottom: 20px;
-            font-size: 14px;
-        }
-
         .page-indicator {
             text-align: center;
             color: #7f8c8d;
@@ -458,10 +484,6 @@
                 grid-template-columns: 1fr;
             }
 
-            .pass-section {
-                gap: 15px;
-            }
-
             .seat {
                 width: 35px;
                 height: 35px;
@@ -474,7 +496,20 @@
             }
 
             .boarding-pass {
-                padding: 25px;
+                aspect-ratio: auto;
+                grid-template-columns: 1fr;
+                padding: 20px;
+                gap: 15px;
+            }
+
+            .pass-right {
+                padding-left: 0;
+                padding-top: 15px;
+                border-top: 2px dashed #2c3e50;
+            }
+
+            .boarding-pass::before {
+                display: none;
             }
         }
     </style>
@@ -578,66 +613,67 @@
             <div class="page" id="page3">
                 <h2 style="margin-bottom: 30px; text-align: center; color: #2c3e50;">Your Boarding Pass</h2>
 
-                <div class="boarding-pass">
-                    <div class="boarding-pass-header">
-                        <div class="airline-name">GLOBAL AIRWAYS</div>
-                        <div style="color: #7f8c8d; font-size: 12px;">Training System</div>
-                        <div class="training-label">TRAINING / NOT VALID FOR TRAVEL</div>
-                    </div>
+                <div class="boarding-pass-container">
+                    <div class="boarding-pass">
+                        <!-- LEFT SIDE -->
+                        <div class="pass-left">
+                            <div class="airline-header">
+                                <div class="airline-logo">✈️</div>
+                                <div class="airline-name">GLOBAL AIRWAYS</div>
+                                <div class="training-label">TRAINING</div>
+                            </div>
 
-                    <div class="pass-section">
-                        <div class="pass-field">
-                            <div class="pass-field-label">Passenger Name</div>
-                            <div class="pass-field-value" id="bpPassengerName"></div>
-                        </div>
-                        <div class="pass-field">
-                            <div class="pass-field-label">PNR</div>
-                            <div class="pass-field-value" id="bpPNR"></div>
-                        </div>
-                    </div>
+                            <div class="pass-fields">
+                                <div class="pass-field">
+                                    <div class="pass-field-label">PASSENGER</div>
+                                    <div class="pass-field-value" id="bpPassengerName"></div>
+                                </div>
+                                <div class="pass-field">
+                                    <div class="pass-field-label">PNR</div>
+                                    <div class="pass-field-value" id="bpPNR"></div>
+                                </div>
+                            </div>
 
-                    <div class="pass-section">
-                        <div class="pass-field">
-                            <div class="pass-field-label">Flight</div>
-                            <div class="pass-field-value" id="bpFlight">GA001</div>
+                            <div class="pass-fields">
+                                <div class="pass-field">
+                                    <div class="pass-field-label">FLIGHT</div>
+                                    <div class="pass-field-value">GA001</div>
+                                </div>
+                                <div class="pass-field">
+                                    <div class="pass-field-label">SEAT</div>
+                                    <div class="pass-field-value" id="bpSeat"></div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="pass-field">
-                            <div class="pass-field-label">Seat</div>
-                            <div class="pass-field-value" id="bpSeat"></div>
-                        </div>
-                    </div>
 
-                    <div class="pass-section">
-                        <div class="pass-field">
-                            <div class="pass-field-label">Boarding Group</div>
-                            <div class="pass-field-value" id="bpBoardingGroup">3</div>
-                        </div>
-                        <div class="pass-field">
-                            <div class="pass-field-label">Gate</div>
-                            <div class="pass-field-value" id="bpGate">42</div>
-                        </div>
-                    </div>
+                        <!-- RIGHT SIDE -->
+                        <div class="pass-right">
+                            <div class="pass-fields">
+                                <div class="pass-field">
+                                    <div class="pass-field-label">BAGGAGE</div>
+                                    <div class="pass-field-value" id="bpBaggageTag"></div>
+                                </div>
+                                <div class="pass-field">
+                                    <div class="pass-field-label">WEIGHT</div>
+                                    <div class="pass-field-value" id="bpWeight"></div>
+                                </div>
+                            </div>
 
-                    <div class="barcode-section">
-                        <div class="barcode-text" id="bpBarcodeText"></div>
-                        <div class="barcode-display">||||| |||| |||||</div>
-                    </div>
+                            <div class="pass-fields">
+                                <div class="pass-field">
+                                    <div class="pass-field-label">BOARDING GROUP</div>
+                                    <div class="pass-field-value">3</div>
+                                </div>
+                                <div class="pass-field">
+                                    <div class="pass-field-label">GATE</div>
+                                    <div class="pass-field-value">42</div>
+                                </div>
+                            </div>
 
-                    <div class="pass-section baggage">
-                        <div class="pass-field">
-                            <div class="pass-field-label">Baggage Tag</div>
-                            <div class="pass-field-value" id="bpBaggageTag"></div>
-                        </div>
-                        <div class="pass-field">
-                            <div class="pass-field-label">Weight Limit</div>
-                            <div class="pass-field-value" id="bpWeight"></div>
-                        </div>
-                    </div>
-
-                    <div class="pass-section full" style="margin-bottom: 0;">
-                        <div class="pass-field">
-                            <div class="pass-field-label">Issued</div>
-                            <div class="pass-field-value" id="bpIssued"></div>
+                            <div class="barcode-area">
+                                <div class="barcode-text" id="bpBarcodeText"></div>
+                                <div class="barcode-display">||||| |||| |||||</div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -854,16 +890,6 @@
             document.getElementById('bpBaggageTag').textContent = state.passenger.baggageTag;
             document.getElementById('bpWeight').textContent = state.passenger.weight + ' kg';
             document.getElementById('bpBarcodeText').textContent = state.passenger.pnr.toUpperCase();
-
-            const now = new Date();
-            const dateStr = now.toLocaleDateString('en-US', { 
-                year: 'numeric', 
-                month: 'short', 
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit'
-            });
-            document.getElementById('bpIssued').textContent = dateStr;
         }
 
         function printBoardingPass() {
